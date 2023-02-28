@@ -1,4 +1,4 @@
-module github.com/oroshnivskyy/go-gin-aws-x-ray
+module github.com/karl-dau/go-gin-aws-x-ray
 
 go 1.13
 
