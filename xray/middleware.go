@@ -23,6 +23,10 @@ func Middleware(sn xray.SegmentNamer) gin.HandlerFunc {
 			name = methodPathSegmentName(c)
 		}
 		ctx, seg := xray.BeginSubsegment(c.Request.Context(), name)
+		if seg == nil {
+			c.Next()
+			return
+		}
 		seg.Annotations = make(map[string]interface{})
 		seg.Annotations["http.method"] = c.Request.Method
 		seg.Annotations["route"] = c.FullPath()
