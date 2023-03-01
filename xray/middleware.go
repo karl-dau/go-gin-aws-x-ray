@@ -21,7 +21,7 @@ func Middleware(sn xray.SegmentNamer) gin.HandlerFunc {
 		if sn != nil {
 			name = sn.Name(c.Request.Host)
 		} else {
-			name = methodPathSegmentName(c.Request)
+			name = methodPathSegmentName(c)
 		}
 		ctx, seg := xray.NewSegmentFromHeader(c.Request.Context(), name, c.Request, traceHeader)
 		c.Request = c.Request.WithContext(ctx)
@@ -69,8 +69,8 @@ func captureResponseData(c *gin.Context, seg *xray.Segment) {
 }
 
 // Define route name by method and path
-func methodPathSegmentName(r *http.Request) string {
-	return fmt.Sprintf("%s:%s", r.Method, r.URL.Path)
+func methodPathSegmentName(c *gin.Context) string {
+	return fmt.Sprintf("%s:%s", c.Request.Method, c.FullPath())
 }
 
 //Add tracing data to header
