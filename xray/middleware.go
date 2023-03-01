@@ -16,7 +16,7 @@ const headerTraceID = "x-amzn-trace-id"
 
 func Middleware(sn xray.SegmentNamer) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		traceHeader := header.FromString(c.Request.Context().Value("x-amzn-trace-id").(string))
+		traceHeader := header.FromString(c.Request.Context().Value(headerTraceID).(string))
 		var name string
 		if sn != nil {
 			name = sn.Name(c.Request.Host)
