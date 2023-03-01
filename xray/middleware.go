@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aws/aws-xray-sdk-go/header"
+	//"github.com/aws/aws-xray-sdk-go/header"
 	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/gin-gonic/gin"
 )
@@ -16,14 +16,17 @@ const headerTraceID = "x-amzn-trace-id"
 
 func Middleware(sn xray.SegmentNamer) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		traceHeader := header.FromString(c.Request.Header.Get(headerTraceID))
 		var name string
 		if sn != nil {
 			name = sn.Name(c.Request.Host)
 		} else {
 			name = methodPathSegmentName(c)
 		}
-		ctx, seg := xray.NewSegmentFromHeader(c.Request.Context(), name, c.Request, traceHeader)
+		ctx, seg := xray.BeginSubsegment(c.Request.Context(), name)
+		seg.Annotations = make(map[string]interface{})
+		seg.Annotations["http.method"] = c.Request.Method
+		seg.Annotations["route"] = c.FullPath()
+		seg.Annotations["http.url"] = c.Request.URL.String()
 		c.Request = c.Request.WithContext(ctx)
 
 		captureRequestData(c, seg)
